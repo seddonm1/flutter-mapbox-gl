@@ -7,6 +7,7 @@ import android.graphics.PointF;
 import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -19,9 +20,10 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.view.FlutterView;
 
 import com.mapbox.mapboxsdk.maps.*;
+import com.mapbox.mapboxsdk.annotations.*;
 import com.mapbox.mapboxsdk.camera.*;
-import com.mapbox.mapboxsdk.geometry.*;
 import com.mapbox.mapboxsdk.constants.*;
+import com.mapbox.mapboxsdk.geometry.*;
 
 /**
  * FlutterMapboxPlugin
@@ -221,6 +223,56 @@ public class FlutterMapboxPlugin implements MethodCallHandler {
       break;
     }
 
+    case "getMinZoom": {
+      long textureId = textureIdOfCall(call);
+      if (maps.containsKey(textureId)) {
+        MapInstance mapInstance = maps.get(textureId);
+
+        Map<String, Object> reply = new HashMap<>();
+        reply.put("zoom", mapInstance.map.getMinZoom());
+        result.success(reply);
+      }
+      result.success(null);
+      break;
+    }
+
+    case "setMinZoom": {
+      long textureId = textureIdOfCall(call);
+      if (maps.containsKey(textureId)) {
+        MapInstance mapInstance = maps.get(textureId);
+
+        double zoom = doubleParamOfCall(call, "zoom");
+        mapInstance.map.setMinZoom(zoom);
+      }
+      result.success(null);
+      break;
+    }
+
+    case "getMaxZoom": {
+      long textureId = textureIdOfCall(call);
+      if (maps.containsKey(textureId)) {
+        MapInstance mapInstance = maps.get(textureId);
+
+        Map<String, Object> reply = new HashMap<>();
+        reply.put("zoom", mapInstance.map.getMaxZoom());
+        result.success(reply);
+      }
+      result.success(null);
+      break;
+    }
+
+    case "setMaxZoom": {
+      long textureId = textureIdOfCall(call);
+      if (maps.containsKey(textureId)) {
+        MapInstance mapInstance = maps.get(textureId);
+
+        double zoom = doubleParamOfCall(call, "zoom");
+        mapInstance.map.setMaxZoom(zoom);
+      }
+      result.success(null);
+      break;
+    }
+
     case "getZoom": {
       long textureId = textureIdOfCall(call);
       if (maps.containsKey(textureId)) {
@@ -228,6 +280,23 @@ public class FlutterMapboxPlugin implements MethodCallHandler {
         Map<String, Object> reply = new HashMap<>();
         reply.put("zoom", mapInstance.map.getZoom());
         result.success(reply);
+      }
+      result.success(null);
+      break;
+    }
+
+    case "addMarker": {
+      long textureId = textureIdOfCall(call);
+      if (maps.containsKey(textureId)) {
+        MapInstance mapInstance = maps.get(textureId);
+
+        Marker marker = parseMarker(call.argument("marker"));
+        // Log.w("title", marker.getTitle());
+        // Log.w("snippet", marker.getSnippet());
+        // Log.w("getLatitude", String.valueOf(marker.getPosition().getLatitude()));
+        // Log.w("getLongitude", String.valueOf(marker.getPosition().getLongitude()));
+
+        mapInstance.map.addMarker(marker);
       }
       result.success(null);
       break;
@@ -308,11 +377,29 @@ public class FlutterMapboxPlugin implements MethodCallHandler {
     return cameraPosition.build();
   }
 
-  private LatLng parseLatLng(Map<String, Object> target) {
-    if (target.containsKey("lat") && target.containsKey("lng")) {
-      return new LatLng(((Number) target.get("lat")).doubleValue(), ((Number) target.get("lng")).doubleValue());
+  private LatLng parseLatLng(Map<String, Object> point) {
+    if (point.containsKey("lat") && point.containsKey("lng")) {
+      return new LatLng(((Number) point.get("lat")).doubleValue(), ((Number) point.get("lng")).doubleValue());
     }
     return null;
+  }
+
+  private Marker parseMarker(Map<String, Object> marker) {
+    MarkerOptions markerOptions = new MarkerOptions();
+
+    String title = (String) marker.get("title");
+    if (title != null)
+      markerOptions.title(title);
+
+    String snippet = (String) marker.get("snippet");
+    if (snippet != null)
+      markerOptions.snippet(snippet);
+
+    LatLng position = parseLatLng((Map<String, Object>) marker.get("position"));
+    if (position != null)
+      markerOptions.position(position);
+
+    return markerOptions.getMarker();
   }
 
   private static class MapInstance {

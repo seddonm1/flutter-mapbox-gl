@@ -56,6 +56,22 @@ class CameraPosition {
   }
 }
 
+class Marker {
+  final LatLng position;
+  final String title;
+  final String snippet;
+
+  Marker({this.position, this.title, this.snippet});
+
+  Map<String, Object> toMap() {
+    return {
+      "position": position.toMap(),
+      "title": title,
+      "snippet": snippet,
+    };
+  }
+}
+
 class MapboxMapOptions {
   final String style;
   final CameraPosition camera;
@@ -186,6 +202,58 @@ class MapboxOverlayController {
     }
   }
 
+  Future<double> getMinZoom() async {
+    try {
+      final Map<Object, Object> reply = await _channel.invokeMethod(
+        'getMinZoom',
+        <String, Object>{'textureId': _textureId},
+      );
+      return reply['zoom'];
+    } on PlatformException catch (e) {
+      return new Future.error(e);
+    }
+  }
+
+  Future<Null> setMinZoom(double zoom) async {
+    try {
+      await _channel.invokeMethod(
+        'setMinZoom',
+        <String, Object>{
+          'textureId': _textureId,
+          'zoom': zoom,
+        },
+      );
+    } on PlatformException catch (e) {
+      return new Future.error(e);
+    }
+  }
+
+  Future<double> getMaxZoom() async {
+    try {
+      final Map<Object, Object> reply = await _channel.invokeMethod(
+        'getMaxZoom',
+        <String, Object>{'textureId': _textureId},
+      );
+      return reply['zoom'];
+    } on PlatformException catch (e) {
+      return new Future.error(e);
+    }
+  }
+
+  Future<Null> setMaxZoom(double zoom) async {
+    try {
+      await _channel.invokeMethod(
+        'setMaxZoom',
+        <String, Object>{
+          'textureId': _textureId,
+          'zoom': zoom,
+        },
+      );
+    } on PlatformException catch (e) {
+      return new Future.error(e);
+    }
+  }
+
   Future<double> getZoom() async {
     try {
       final Map<Object, Object> reply = await _channel.invokeMethod(
@@ -193,6 +261,20 @@ class MapboxOverlayController {
         <String, Object>{'textureId': _textureId},
       );
       return reply['zoom'];
+    } on PlatformException catch (e) {
+      return new Future.error(e);
+    }
+  }
+
+  Future<Null> addMarker(Marker marker) async {
+    try {
+      await _channel.invokeMethod(
+        'addMarker',
+        <String, Object>{
+          'textureId': _textureId,
+          'marker': marker.toMap(),
+        },
+      );
     } on PlatformException catch (e) {
       return new Future.error(e);
     }

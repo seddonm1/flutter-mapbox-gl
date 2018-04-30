@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.annotations.Marker;
 
 public class FlutterMap implements NativeMapView.ViewCallback, MapView.OnMapChangedListener {
   private Context context;
@@ -110,11 +111,31 @@ public class FlutterMap implements NativeMapView.ViewCallback, MapView.OnMapChan
     nativeMapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
   }
 
+  public double getMinZoom() {
+    return nativeMapView.getMinZoom();
+  }
+
+  public void setMinZoom(double zoom) {
+    nativeMapView.setMinZoom(zoom);
+  }
+
+  public double getMaxZoom() {
+    return nativeMapView.getMaxZoom();
+  }
+
+  public void setMaxZoom(double zoom) {
+    nativeMapView.setMaxZoom(zoom);
+  }
+
   public double getZoom() {
     return nativeMapView.getZoom();
   }
 
   public void zoom(double zoom, PointF focalPoint, long duration) {
     nativeMapView.setZoom(zoom, focalPoint, duration);
+  }
+
+  public void addMarker(Marker marker) {
+    nativeMapView.addMarker(marker);
   }
 }

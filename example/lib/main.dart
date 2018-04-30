@@ -82,6 +82,31 @@ class _MapBoxDemoState extends State<MapBoxDemo> {
                 Navigator.of(context).pop();
               },
             ),
+            new ListTile(
+              title: new Text('addMarker Melbourne'),
+              onTap: () {
+                controller.addMarker(new Marker(
+                    position: new LatLng(lat: -37.810719, lng: 144.954474),
+                    title: "Flagstaff Gardens",
+                    snippet:
+                        "Spacious, tranquil park with landscaped gardens & sculptures, plus picnic & recreational facilities."));
+                Navigator.of(context).pop();
+              },
+            ),
+            new ListTile(
+              title: new Text('setMinZoom(9)'),
+              onTap: () {
+                controller.setMinZoom(9.0);
+                Navigator.of(context).pop();
+              },
+            ),
+            new ListTile(
+              title: new Text('setMaxZoom(11.5)'),
+              onTap: () {
+                controller.setMaxZoom(11.5);
+                Navigator.of(context).pop();
+              },
+            ),
           ],
         ),
       ),
